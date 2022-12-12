@@ -20,25 +20,17 @@ namespace TheatricalPlayersRefactoringKata
                 switch (play.Type) 
                 {
                     case "tragedy":
-                        thisAmount = 40000;
-                        if (perf.Audience > 30) {
-                            thisAmount += 1000 * (perf.Audience - 30);
-                        }
+                        thisAmount = setAmountForTragedy(perf.Audience);
                         break;
                     case "comedy":
-                        thisAmount = 30000;
-                        if (perf.Audience > 20) {
-                            thisAmount += 10000 + 500 * (perf.Audience - 20);
-                        }
-                        thisAmount += 300 * perf.Audience;
+                        thisAmount = setAmountForComedy(perf.Audience);
+                        volumeCredits += addExtraCreditsForEveryTenComedyAttendees(perf.Audience);
                         break;
                     default:
                         throw new Exception("unknown type: " + play.Type);
                 }
                 // add volume credits
                 volumeCredits += Math.Max(perf.Audience - 30, 0);
-                // add extra credit for every ten comedy attendees
-                if ("comedy" == play.Type) volumeCredits += (int)Math.Floor((decimal)perf.Audience / 5);
 
                 // print line for this order
                 result += String.Format(cultureInfo, "  {0}: {1:C} ({2} seats)\n", play.Name, Convert.ToDecimal(thisAmount / 100), perf.Audience);
@@ -47,6 +39,26 @@ namespace TheatricalPlayersRefactoringKata
             result += String.Format(cultureInfo, "Amount owed is {0:C}\n", Convert.ToDecimal(totalAmount / 100));
             result += String.Format("You earned {0} credits\n", volumeCredits);
             return result;
+        }
+
+        public int setAmountForTragedy(int perfAudience) {
+            var thisAmount = 40000;
+            if (perfAudience > 30) {
+                thisAmount += 1000 * (perfAudience - 30);
+            }
+            return thisAmount;
+        }
+
+        public int setAmountForComedy(int perfAudience) {
+            var thisAmount = 30000 + 300 * perfAudience;
+            if (perfAudience > 20) {
+                thisAmount += 10000 + 500 * (perfAudience - 20);
+            }
+            return thisAmount;
+        }
+
+        public int addExtraCreditsForEveryTenComedyAttendees(int perfAudience) {
+            return (int)Math.Floor((decimal)perfAudience / 5);
         }
     }
 }
